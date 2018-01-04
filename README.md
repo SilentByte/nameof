@@ -1,6 +1,7 @@
 
 nameof
 ======
+[![Crate Version](https://img.shields.io/crates/v/nameof.svg)](https://crates.io/crates/nameof)
 [![Build Status](https://travis-ci.org/SilentByte/nameof.svg?branch=master)](https://travis-ci.org/SilentByte/nameof)
 [![MIT License](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/MIT)
 
