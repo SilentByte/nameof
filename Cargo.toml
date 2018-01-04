@@ -1,0 +1,8 @@
+[package]
+name = "nameof"
+version = "0.1.0"
+license = "MIT"
+description = "Provides a Rust macro to determine the string name of an identifier or type."
+authors = ["Rico A. Beti <rico.beti@silentbyte.com>"]
+repository = "https://github.com/SilentByte/nameof.git"
+homepage = "https://github.com/SilentByte/nameof"
