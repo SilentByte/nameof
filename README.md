@@ -7,9 +7,32 @@ nameof
 The `name_of!()` macro defined in this crate takes a binding, type, or function as an argument and returns its unqualified string representation. If the identifier does not exist in the current context, the macro will cause a compilation error. This macro is mainly intended for debugging purposes and to improve the refactoring experience compared to `stringify!()`.
 
 
+## Usage
+
+Add `nameof` as a dependency to your project's `Cargo.toml` file:
+
+```toml
+[dependencies]
+nameof = "*"
+```
+
+To use the macro(s), import the crate with the required annotation:
+
+```toml
+#[macro_use]
+extern crate nameof;
+
+fn main() {
+    let text = "Hello, World!";
+    println!("Variable `{}` holds `{}`.", name_of!(text), text);
+}
+```
+
+
 ## Examples
 
 The `name_of!()` macro is used as follows:
+
 ```rust
 #[macro_use]
 extern crate nameof;
@@ -32,6 +55,7 @@ fn main() {
 ```
 
 Alternatively, `name_of_type!(T)` can be used instead of `name_of!(type T)`.
+
 ```rust
 #[macro_use]
 extern crate nameof;
