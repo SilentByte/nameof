@@ -3,7 +3,8 @@
 //!
 //! MIT License
 //! Copyright (c) 2018 SilentByte <https://silentbyte.com/>
-//!
+
+#![crate_name = "nameof"]
 
 /// Takes a variable, type, or function as an argument and returns its
 /// unqualified string representation. If the identifier does not exist
@@ -14,6 +15,8 @@
 /// # Examples
 ///
 /// ```
+/// # #[macro_use] extern crate nameof;
+/// # fn main() {
 /// // Bindings
 /// let text = "Hello, World!";
 /// println!("Variable `{}` holds `{}`.", name_of!(text), text);
@@ -26,7 +29,9 @@
 /// struct TestStruct { test_field: i32 }
 /// println!("Struct is called `{}`.", name_of!(type TestStruct));
 /// println!("Field is called `{}`.", name_of!(test_field for TestStruct));
-/// println!("Standard Types: `{}`.", name_of!(i32));
+/// println!("Standard Types: `{}`.", name_of!(type i32));
+///
+/// # }
 /// ```
 #[macro_export]
 macro_rules! name_of {
@@ -53,10 +58,14 @@ macro_rules! name_of {
 /// # Examples
 ///
 /// ```
+/// #[macro_use] extern crate nameof;
+/// # fn main() {
 /// // Alternative for Types
 /// struct TestStruct { test_field: i32 }
 /// println!("Struct is called `{}`.", name_of_type!(TestStruct));
 /// println!("Struct is called `{}`.", name_of_type!(i32));
+///
+/// # }
 /// ```
 #[macro_export]
 macro_rules! name_of_type {
