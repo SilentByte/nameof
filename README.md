@@ -18,7 +18,7 @@ nameof = "*"
 
 To use the macro(s), import the crate with the required annotation:
 
-```toml
+```rust
 #[macro_use]
 extern crate nameof;
 
