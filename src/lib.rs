@@ -30,7 +30,7 @@
 /// struct TestStruct { test_field: i32 }
 /// println!("Struct is called `{}`.", name_of!(type TestStruct));
 /// println!("Standard Types: `{}`.", name_of!(type i32));
-/// println!("Field is called `{}`.", name_of!(test_field for TestStruct));
+/// println!("Field is called `{}`.", name_of!(test_field in TestStruct));
 ///
 /// # }
 /// ```
@@ -50,7 +50,7 @@ macro_rules! name_of {
     }};
 
     // Covers Struct Fields
-    ($n: ident for $t: ty) => {{
+    ($n: ident in $t: ty) => {{
         |f: $t| {
             let _ = &f.$n;
         };
@@ -153,13 +153,13 @@ mod tests {
 
     #[test]
     fn name_of_struct_field() {
-        assert_eq!(name_of!(test_field for TestStruct), "test_field");
+        assert_eq!(name_of!(test_field in TestStruct), "test_field");
     }
 
     #[test]
     fn name_of_generic_struct_field() {
         assert_eq!(
-            name_of!(test_field for TestGenericStruct<i32>),
+            name_of!(test_field in TestGenericStruct<i32>),
             "test_field"
         );
     }
@@ -167,12 +167,12 @@ mod tests {
     #[test]
     fn name_of_generic_multi_type_struct_field() {
         assert_eq!(
-            name_of!(test_field_t for TestGenericStructMultiType<i32, TestGenericStruct<String>>),
+            name_of!(test_field_t in TestGenericStructMultiType<i32, TestGenericStruct<String>>),
             "test_field_t"
         );
 
         assert_eq!(
-            name_of!(test_field_u for TestGenericStructMultiType<i32, TestGenericStruct<String>>),
+            name_of!(test_field_u in TestGenericStructMultiType<i32, TestGenericStruct<String>>),
             "test_field_u"
         );
     }
