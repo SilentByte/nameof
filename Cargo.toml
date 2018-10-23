@@ -1,6 +1,6 @@
 [package]
 name = "nameof"
-version = "1.0.0"
+version = "1.0.1"
 license = "MIT"
 description = "Provides a Rust macro to determine the string name of a binding, type, or function."
 authors = ["Rico A. Beti <rico.beti@silentbyte.com>"]

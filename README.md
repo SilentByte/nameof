@@ -14,7 +14,7 @@ Add `nameof` as a dependency to your project's `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nameof = "*"
+nameof = "1.0"
 ```
 
 To use the macro(s), import the crate with the required annotation:
@@ -25,7 +25,7 @@ extern crate nameof;
 
 fn main() {
     let text = "Hello, World!";
-    println!("Variable `{}` holds `{}`.", name_of!(text), text);
+    println!("Binding `{}` holds `{}`.", name_of!(text), text);
 }
 ```
 
@@ -38,20 +38,42 @@ The `name_of!()` macro is used as follows:
 #[macro_use]
 extern crate nameof;
 
+struct TestStruct {
+    test_field: i32,
+}
+
+struct GenericStruct<T> {
+    test_field_t: T,
+}
+
+fn greet() -> &'static str {
+    "Hi, World"
+}
+
 fn main() {
-    // Bindings
     let text = "Hello, World!";
-    println!("Variable `{}` holds `{}`.", name_of!(text), text);
-    
-    // Functions
-    fn greet() { }
-    println!("Function is called `{}`.", name_of!(greet));
-    
-    // Types & Fields
-    struct TestStruct { test_field: i32 }
-    println!("Struct is called `{}`.", name_of!(type TestStruct));
-    println!("Standard Types: `{}`.", name_of!(type i32));
-    println!("Field is called `{}`.", name_of!(test_field for TestStruct));
+
+    println!("Binding `{}` holds `{}`.", name_of!(text), text);
+
+    println!("Function `{}` says `{}`.", name_of!(greet), greet());
+
+    println!(
+        "Struct `{}` has a field `{}`.",
+        name_of!(type TestStruct),
+        name_of!(test_field in TestStruct)
+    );
+
+    println!(
+        "Generic Struct `{}` has a field `{}`.",
+        name_of!(type GenericStruct<String>),
+        name_of!(test_field_t in GenericStruct<String>)
+    );
+
+    println!(
+        "Standard types such as `{}` and `{}` also work.",
+        name_of!(type i32),
+        name_of!(type f64)
+    );
 }
 ```
 
@@ -61,10 +83,13 @@ Alternatively, `name_of_type!(T)` can be used instead of `name_of!(type T)`.
 #[macro_use]
 extern crate nameof;
 
+struct TestStruct {
+    test_field: i32,
+}
+
 fn main() {
-    struct TestStruct { test_field: i32 }
     println!("Struct is called `{}`.", name_of_type!(TestStruct));
-    println!("Struct is called `{}`.", name_of_type!(i32));
+    println!("Type is called `{}`.", name_of_type!(i32));
 }
 ```
 
