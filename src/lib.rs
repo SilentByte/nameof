@@ -11,7 +11,19 @@
 /// unqualified string representation. If the identifier does not exist
 /// in the current context, the macro will cause a compilation error.
 /// This macro is mainly intended for debugging purposes and to improve
-/// the refactoring experience compared to `stringify!()`.
+/// the refactoring experience compared to plain `stringify!()`.
+///
+/// The syntax depends on the type of the identifier:
+///
+/// 1. Bindings to variables and functions require no annotation,
+///    e.g. `name_of!(some_binding)`.
+///
+/// 2. Types and structs require the keyword `type`, e.g. `name_of!(type SomeType)`.
+///    Alternatively, the macro `name_of_type!(SomeType)` may be used.
+///
+/// 3. Fields within structs are referred to with the `in` keyword,
+///    e.g. `name_of!(some_field in SomeType)`.
+///
 ///
 /// # Examples
 ///
@@ -80,7 +92,10 @@ macro_rules! name_of {
     }};
 }
 
-/// Alternative for the `name_of!(type T)` macro specifically for types.
+/// Takes the name of a type as its sole parameter,
+/// e.g. `name_of_type!(SomeStruct)` or `name_of_type!(f64)`.
+///
+/// It is an alternative to the `name_of!(type T)` macro, specifically for types.
 ///
 /// # Examples
 ///
@@ -182,10 +197,7 @@ mod tests {
 
     #[test]
     fn name_of_generic_struct_field() {
-        assert_eq!(
-            name_of!(test_field in TestGenericStruct<i32>),
-            "test_field"
-        );
+        assert_eq!(name_of!(test_field in TestGenericStruct<i32>), "test_field");
     }
 
     #[test]
