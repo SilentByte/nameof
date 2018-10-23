@@ -3,6 +3,7 @@
 //!
 //! MIT License
 //! Copyright (c) 2018 SilentByte <https://silentbyte.com/>
+//!
 
 #![crate_name = "nameof"]
 
@@ -37,7 +38,9 @@
 macro_rules! name_of {
     // Covers Bindings
     ($n: ident) => {{
-        || { &$n; };
+        || {
+            &$n;
+        };
         stringify!($n)
     }};
 
@@ -48,7 +51,9 @@ macro_rules! name_of {
 
     // Covers Struct Fields
     ($n: ident for $t: ty) => {{
-        |f: $t| { let _ = &f.$n; };
+        |f: $t| {
+            let _ = &f.$n;
+        };
         stringify!($n)
     }};
 }
@@ -71,7 +76,9 @@ macro_rules! name_of {
 macro_rules! name_of_type {
     // Covers Types
     ($t: ty) => {{
-        || { let _: $t; };
+        || {
+            let _: $t;
+        };
         stringify!($t)
     }};
 }
@@ -88,6 +95,11 @@ mod tests {
 
     struct TestGenericStruct<T> {
         test_field: T,
+    }
+
+    struct TestGenericStructMultiType<T, U> {
+        test_field_t: T,
+        test_field_u: U,
     }
 
     #[test]
@@ -127,6 +139,19 @@ mod tests {
     }
 
     #[test]
+    fn name_of_generic_multi_type_struct() {
+        assert_eq!(
+            name_of!(type TestGenericStructMultiType<i32, TestGenericStruct<String>>),
+            "TestGenericStructMultiType<i32, TestGenericStruct<String>>"
+        );
+
+        assert_eq!(
+            name_of_type!( TestGenericStructMultiType<i32, TestGenericStruct<String>>),
+            "TestGenericStructMultiType<i32, TestGenericStruct<String>>"
+        );
+    }
+
+    #[test]
     fn name_of_struct_field() {
         assert_eq!(name_of!(test_field for TestStruct), "test_field");
     }
@@ -136,6 +161,19 @@ mod tests {
         assert_eq!(
             name_of!(test_field for TestGenericStruct<i32>),
             "test_field"
+        );
+    }
+
+    #[test]
+    fn name_of_generic_multi_type_struct_field() {
+        assert_eq!(
+            name_of!(test_field_t for TestGenericStructMultiType<i32, TestGenericStruct<String>>),
+            "test_field_t"
+        );
+
+        assert_eq!(
+            name_of!(test_field_u for TestGenericStructMultiType<i32, TestGenericStruct<String>>),
+            "test_field_u"
         );
     }
 }
