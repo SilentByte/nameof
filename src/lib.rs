@@ -18,19 +18,41 @@
 /// ```
 /// # #[macro_use] extern crate nameof;
 /// # fn main() {
-/// // Bindings
+/// struct TestStruct {
+///     test_field: i32,
+/// }
+///
+/// struct GenericStruct<T> {
+///     test_field_t: T,
+/// }
+///
+/// fn greet() -> &'static str {
+///     "Hi, World"
+/// }
+///
 /// let text = "Hello, World!";
-/// println!("Variable `{}` holds `{}`.", name_of!(text), text);
 ///
-/// // Functions
-/// fn greet() { }
-/// println!("Function is called `{}`.", name_of!(greet));
+/// println!("Binding `{}` holds `{}`.", name_of!(text), text);
 ///
-/// // Types & Fields
-/// struct TestStruct { test_field: i32 }
-/// println!("Struct is called `{}`.", name_of!(type TestStruct));
-/// println!("Standard Types: `{}`.", name_of!(type i32));
-/// println!("Field is called `{}`.", name_of!(test_field in TestStruct));
+/// println!("Function `{}` says `{}`.", name_of!(greet), greet());
+///
+/// println!(
+///     "Struct `{}` has a field `{}`.",
+///     name_of!(type TestStruct),
+///     name_of!(test_field in TestStruct)
+/// );
+///
+/// println!(
+///     "Generic Struct `{}` has a field `{}`.",
+///     name_of!(type GenericStruct<String>),
+///     name_of!(test_field_t in GenericStruct<String>)
+/// );
+///
+/// println!(
+///     "Standard types such as `{}` and `{}` also work.",
+///     name_of!(type i32),
+///     name_of!(type f64)
+/// );
 ///
 /// # }
 /// ```
@@ -63,12 +85,14 @@ macro_rules! name_of {
 /// # Examples
 ///
 /// ```
-/// #[macro_use] extern crate nameof;
+/// # #[macro_use] extern crate nameof;
 /// # fn main() {
-/// // Alternative for Types
-/// struct TestStruct { test_field: i32 }
+/// struct TestStruct {
+///     test_field: i32
+/// }
+///
 /// println!("Struct is called `{}`.", name_of_type!(TestStruct));
-/// println!("Struct is called `{}`.", name_of_type!(i32));
+/// println!("Type is called `{}`.", name_of_type!(i32));
 ///
 /// # }
 /// ```
