@@ -8,5 +8,15 @@ repository = "https://github.com/SilentByte/nameof.git"
 homepage = "https://github.com/SilentByte/nameof"
 readme = "README.md"
 
+[[test]]
+name = "nameof_type_2015_edition"
+path = "tests/nameof_type_2015_edition.rs"
+edition = "2015"
+
+[[test]]
+name = "nameof_type_2018_edition"
+path = "tests/nameof_type_2018_edition.rs"
+edition = "2018"
+
 [badges]
 travis-ci = { repository = "SilentByte/nameof", branch = "master" }

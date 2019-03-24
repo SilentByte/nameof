@@ -80,7 +80,7 @@ macro_rules! name_of {
 
     // Covers Types
     (type $t: ty) => {{
-        name_of_type!($t)
+        $crate::name_of_type!($t)
     }};
 
     // Covers Struct Fields
