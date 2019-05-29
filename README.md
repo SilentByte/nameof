@@ -14,7 +14,7 @@ Add `nameof` as a dependency to your project's `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nameof = "1.0"
+nameof = "1.1"
 ```
 
 To use the macro(s), import the crate with the required annotation:
