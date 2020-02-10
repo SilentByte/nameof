@@ -5,7 +5,7 @@ nameof
 [![Build Status](https://travis-ci.org/SilentByte/nameof.svg?branch=master)](https://travis-ci.org/SilentByte/nameof)
 [![MIT License](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/MIT)
 
-The `name_of!()` macro defined in this crate takes a binding, type, or function as an argument and returns its unqualified string representation. If the identifier does not exist in the current context, the macro will cause a compilation error. This macro is mainly intended for debugging purposes and to improve the refactoring experience compared to `stringify!()`.
+The `name_of!()` macro defined in this crate takes a binding, type, const, or function as an argument and returns its unqualified string representation. If the identifier does not exist in the current context, the macro will cause a compilation error. This macro is mainly intended for debugging purposes and to improve the refactoring experience compared to `stringify!()`.
 
 
 ## Usage

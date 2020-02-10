@@ -7,7 +7,7 @@
 
 #![crate_name = "nameof"]
 
-/// Takes a binding, type, or function as an argument and returns its
+/// Takes a binding, type, const, or function as an argument and returns its
 /// unqualified string representation. If the identifier does not exist
 /// in the current context, the macro will cause a compilation error.
 /// This macro is mainly intended for debugging purposes and to improve
