@@ -42,6 +42,10 @@ struct TestStruct {
     test_field: i32,
 }
 
+impl TestStruct {
+    const TEST_CONST: i32 = 1;
+}
+
 struct GenericStruct<T> {
     test_field_t: T,
 }
@@ -67,6 +71,12 @@ fn main() {
         "Generic Struct `{}` has a field `{}`.",
         name_of!(type GenericStruct<String>),
         name_of!(test_field_t in GenericStruct<String>)
+    );
+
+    println!(
+        "Struct `{}` has an associated constant `{}`.",
+        name_of!(type TestStruct),
+        name_of!(const TEST_CONST in TestStruct)
     );
 
     println!(

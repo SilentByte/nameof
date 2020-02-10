@@ -34,6 +34,10 @@
 ///     test_field: i32,
 /// }
 ///
+/// impl TestStruct {
+///     const TEST_CONST: i32 = 1;
+/// }
+///
 /// struct GenericStruct<T> {
 ///     test_field_t: T,
 /// }
@@ -58,6 +62,12 @@
 ///     "Generic Struct `{}` has a field `{}`.",
 ///     name_of!(type GenericStruct<String>),
 ///     name_of!(test_field_t in GenericStruct<String>)
+/// );
+///
+/// println!(
+///     "Struct `{}` has an associated constant `{}`.",
+///     name_of!(type TestStruct),
+///     name_of!(const TEST_CONST in TestStruct)
 /// );
 ///
 /// println!(
@@ -87,6 +97,14 @@ macro_rules! name_of {
     ($n: ident in $t: ty) => {{
         |f: $t| {
             let _ = &f.$n;
+        };
+        stringify!($n)
+    }};
+
+    // Covers Struct Constants
+    (const $n: ident in $t: ty) => {{
+        || {
+            let _ = &<$t>::$n;
         };
         stringify!($n)
     }};
@@ -130,6 +148,10 @@ mod tests {
 
     struct TestStruct {
         test_field: i32,
+    }
+    
+    impl TestStruct {
+        const TEST_CONST: i32 = 1;
     }
 
     struct TestGenericStruct<T> {
@@ -211,5 +233,10 @@ mod tests {
             name_of!(test_field_u in TestGenericStructMultiType<i32, TestGenericStruct<String>>),
             "test_field_u"
         );
+    }
+
+    #[test]
+    fn name_of_struct_constant() {
+        assert_eq!(name_of!(const TEST_CONST in TestStruct), "TEST_CONST");
     }
 }
