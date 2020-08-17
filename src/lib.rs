@@ -82,7 +82,7 @@
 macro_rules! name_of {
     // Covers Bindings
     ($n: ident) => {{
-        || {
+        let _ = || {
             &$n;
         };
         stringify!($n)
@@ -95,7 +95,7 @@ macro_rules! name_of {
 
     // Covers Struct Fields
     ($n: ident in $t: ty) => {{
-        |f: $t| {
+        let _ = |f: $t| {
             let _ = &f.$n;
         };
         stringify!($n)
@@ -103,7 +103,7 @@ macro_rules! name_of {
 
     // Covers Struct Constants
     (const $n: ident in $t: ty) => {{
-        || {
+        let _ = || {
             let _ = &<$t>::$n;
         };
         stringify!($n)
@@ -133,7 +133,7 @@ macro_rules! name_of {
 macro_rules! name_of_type {
     // Covers Types
     ($t: ty) => {{
-        || {
+        let _ = || {
             let _: $t;
         };
         stringify!($t)
@@ -149,7 +149,7 @@ mod tests {
     struct TestStruct {
         test_field: i32,
     }
-    
+
     impl TestStruct {
         const TEST_CONST: i32 = 1;
     }
