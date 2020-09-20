@@ -140,6 +140,32 @@ macro_rules! name_of_type {
     }};
 }
 
+/// Takes the path of a type/mod/const.. as its path &str,
+/// e.g. `path_of!(web::info::Foo)`.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate nameof;
+/// use web::info::Foo;
+///
+/// # fn main() {
+///
+/// println!("struct path `{}`.", path_of!(web::info::Foo));
+///
+/// # }
+/// ```
+#[macro_export]
+macro_rules! path_of {
+    ($p: path) => {{
+        let _ = || {
+            use $p;
+        };
+
+        stringify!($p)
+    }};
+}
+
 #[cfg(test)]
 mod tests {
     fn test_fn() {
@@ -178,6 +204,11 @@ mod tests {
     fn name_of_type() {
         assert_eq!(name_of!(type i32), "i32");
         assert_eq!(name_of_type!(i32), "i32");
+    }
+
+    #[test]
+    fn path_of() {
+        assert_eq!(path_of!(test_fn), "test_fn");
     }
 
     #[test]
