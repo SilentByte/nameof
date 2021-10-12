@@ -83,7 +83,7 @@ macro_rules! name_of {
     // Covers Bindings
     ($n: ident) => {{
         let _ = || {
-            &$n;
+            let _ = &$n;
         };
         stringify!($n)
     }};
