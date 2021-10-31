@@ -14,14 +14,13 @@ Add `nameof` as a dependency to your project's `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nameof = "1.1"
+nameof = "1.2.2"
 ```
 
 To use the macro(s), import the crate with the required annotation:
 
 ```rust
-#[macro_use]
-extern crate nameof;
+use nameof::name_of;
 
 fn main() {
     let text = "Hello, World!";
@@ -35,8 +34,7 @@ fn main() {
 The `name_of!()` macro is used as follows:
 
 ```rust
-#[macro_use]
-extern crate nameof;
+use nameof::name_of;
 
 struct TestStruct {
     test_field: i32,
@@ -90,8 +88,7 @@ fn main() {
 Alternatively, `name_of_type!(T)` can be used instead of `name_of!(type T)`.
 
 ```rust
-#[macro_use]
-extern crate nameof;
+use nameof::name_of_type;
 
 struct TestStruct {
     test_field: i32,
@@ -106,4 +103,3 @@ fn main() {
 ## License
 
 See [LICENSE.txt](LICENSE.txt).
-
