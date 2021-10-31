@@ -44,4 +44,6 @@ fn main() {
         name_of!(type i32),
         name_of!(type f64)
     );
+
+    println!("{}", path_of!(crate::greet));
 }
