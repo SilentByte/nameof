@@ -7,6 +7,7 @@ authors = ["Rico A. Beti <rico.beti@silentbyte.com>"]
 repository = "https://github.com/SilentByte/nameof.git"
 homepage = "https://github.com/SilentByte/nameof"
 readme = "README.md"
+keywords = ["macro", "nameof", "no_std"]
 
 [[test]]
 name = "nameof_type_2015_edition"

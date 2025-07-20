@@ -6,6 +6,7 @@
 //!
 
 #![crate_name = "nameof"]
+#![no_std]
 
 /// Takes a binding, type, const, or function as an argument and returns its
 /// unqualified string representation. If the identifier does not exist
@@ -141,7 +142,13 @@ macro_rules! name_of_type {
 }
 
 #[cfg(test)]
+extern crate std;
+
+#[cfg(test)]
 mod tests {
+
+    use std::string::String;
+
     fn test_fn() {
         //
     }
