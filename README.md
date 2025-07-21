@@ -1,12 +1,15 @@
+# nameof
 
-nameof
-======
 [![Crate Version](https://img.shields.io/crates/v/nameof.svg)](https://crates.io/crates/nameof)
 [![Build Status](https://travis-ci.org/SilentByte/nameof.svg?branch=master)](https://travis-ci.org/SilentByte/nameof)
 [![MIT License](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/MIT)
 
-The `name_of!()` macro defined in this crate takes a binding, type, const, or function as an argument and returns its unqualified string representation. If the identifier does not exist in the current context, the macro will cause a compilation error. This macro is mainly intended for debugging purposes and to improve the refactoring experience compared to `stringify!()`.
-
+The `name_of!()` macro defined in this crate takes a binding, type, const,
+function, or enum variant as an argument and returns its unqualified string
+representation. If the identifier does not exist in the current context, the
+macro will cause a compilation error. This macro is mainly intended for
+debugging purposes and to improve the refactoring experience compared to
+`stringify!()`.
 
 ## Usage
 
@@ -28,7 +31,6 @@ fn main() {
 }
 ```
 
-
 ## Examples
 
 The `name_of!()` macro is used as follows:
@@ -46,6 +48,13 @@ impl TestStruct {
 
 struct GenericStruct<T> {
     test_field_t: T,
+}
+
+#[derive(Debug)]
+enum Color {
+    Red,
+    Rgb(u8, u8, u8),
+    Hsl { h: u16, s: u8, l: u8 },
 }
 
 fn greet() -> &'static str {
@@ -82,6 +91,12 @@ fn main() {
         name_of!(type i32),
         name_of!(type f64)
     );
+
+    // Enum variants
+    println!("Unit variant: {}", name_of!(Color::Red)); // "Red"
+    println!("Tuple variant: {}", name_of!(Color::Rgb(..))); // "Rgb"
+    println!("Tuple variant with values: {}", name_of!(Color::Rgb(255, 128, 0))); // "Rgb(255, 128, 0)"
+    println!("Struct variant: {}", name_of!(Color::Hsl { .. })); // "Hsl"
 }
 ```
 
