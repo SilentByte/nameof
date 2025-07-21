@@ -141,13 +141,92 @@ macro_rules! name_of_type {
     }};
 }
 
+/// Takes an enum variant as its parameter and returns its unqualified string representation.
+/// If the enum variant does not exist in the current context, the macro will cause a compilation error.
+/// This macro is mainly intended for debugging purposes and to improve the refactoring experience.
+///
+/// The syntax supports different forms of enum variants with different output formats:
+///
+/// 1. Unit variants: `tag_of!(SomeEnum::Variant)` → `"Variant"`
+/// 2. Tuple variants with range: `tag_of!(SomeEnum::Variant(..))` → `"Variant"`
+/// 3. Tuple variants with values: `tag_of!(SomeEnum::Variant(value1, value2))` → `"Variant(value1, value2)"`
+/// 4. Struct variants: `tag_of!(SomeEnum::Variant { .. })` → `"Variant"`
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate nameof;
+/// # fn main() {
+/// #[derive(Debug)]
+/// enum Color {
+///     Red,
+///     Green,
+///     Blue,
+///     Rgb(u8, u8, u8),
+///     Hsl { h: u16, s: u8, l: u8 },
+/// }
+///
+/// println!("Unit variant: {}", tag_of!(Color::Red)); // "Red"
+/// println!("Tuple variant: {}", tag_of!(Color::Rgb(..))); // "Rgb"
+/// println!("Tuple variant with values: {}", tag_of!(Color::Rgb(255, 128, 0))); // "Rgb(255, 128, 0)"
+/// println!("Struct variant: {}", tag_of!(Color::Hsl { .. })); // "Hsl"
+/// # }
+/// ```
+#[macro_export]
+macro_rules! tag_of {
+    // Unit variants: EnumName::Variant
+    ($enum_name:ident :: $variant:ident) => {{
+        let _ = || {
+            let _ = $enum_name::$variant;
+        };
+        stringify!($variant)
+    }};
+
+    // Tuple variants with range: EnumName::Variant(..)
+    ($enum_name:ident :: $variant:ident ( .. )) => {{
+        let _ = || {
+            // Use pattern matching to verify the variant exists
+            match None::<$enum_name> {
+                Some($enum_name::$variant(..)) => {}
+                _ => {}
+            }
+        };
+        stringify!($variant)
+    }};
+
+    // Tuple variants with specific values: EnumName::Variant(value1, value2, ...)
+    ($enum_name:ident :: $variant:ident ( $($value:expr),+ )) => {{
+        let _ = || {
+            let _ = $enum_name::$variant($($value,)*);
+        };
+        {
+            extern crate std;
+            let variant_name = stringify!($variant);
+            let values = std::vec![$(std::format!("{:?}", $value)),+];
+            std::format!("{}({})", variant_name, values.join(", "))
+        }
+    }};
+
+    // Struct variants with fields: EnumName::Variant { .. }
+    ($enum_name:ident :: $variant:ident { .. }) => {{
+        let _ = || {
+            // Use pattern matching to verify the variant exists
+            match None::<$enum_name> {
+                Some($enum_name::$variant { .. }) => {}
+                _ => {}
+            }
+        };
+        stringify!($variant)
+    }};
+}
+
 #[cfg(test)]
 extern crate std;
 
 #[cfg(test)]
 mod tests {
 
-    use std::string::String;
+    use std::string::{String, ToString};
 
     fn test_fn() {
         //
@@ -168,6 +247,14 @@ mod tests {
     struct TestGenericStructMultiType<T, U> {
         test_field_t: T,
         test_field_u: U,
+    }
+
+    #[derive(Debug)]
+    enum TestEnum {
+        UnitVariant,
+        TupleVariant(i32),
+        TupleVariantMultiple(i32, String),
+        StructVariant { field1: i32, field2: String },
     }
 
     #[test]
@@ -245,5 +332,41 @@ mod tests {
     #[test]
     fn name_of_struct_constant() {
         assert_eq!(name_of!(const TEST_CONST in TestStruct), "TEST_CONST");
+    }
+
+    #[test]
+    fn tag_of_unit_variant() {
+        assert_eq!(tag_of!(TestEnum::UnitVariant), "UnitVariant");
+    }
+
+    #[test]
+    fn tag_of_tuple_variant() {
+        assert_eq!(tag_of!(TestEnum::TupleVariant(..)), "TupleVariant");
+    }
+
+    #[test]
+    fn tag_of_tuple_variant_multiple() {
+        assert_eq!(
+            tag_of!(TestEnum::TupleVariantMultiple(..)),
+            "TupleVariantMultiple"
+        );
+    }
+
+    #[test]
+    fn tag_of_struct_variant() {
+        assert_eq!(tag_of!(TestEnum::StructVariant { .. }), "StructVariant");
+    }
+
+    #[test]
+    fn tag_of_tuple_variant_with_values() {
+        assert_eq!(tag_of!(TestEnum::TupleVariant(42)), "TupleVariant(42)");
+    }
+
+    #[test]
+    fn tag_of_tuple_variant_multiple_with_values() {
+        assert_eq!(
+            tag_of!(TestEnum::TupleVariantMultiple(42, "test".to_string())),
+            "TupleVariantMultiple(42, \"test\")"
+        );
     }
 }
