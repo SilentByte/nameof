@@ -8,7 +8,7 @@
 #![crate_name = "nameof"]
 #![no_std]
 
-/// Takes a binding, type, const, or function as an argument and returns its
+/// Takes a binding, type, const, function, or enum variant as an argument and returns its
 /// unqualified string representation. If the identifier does not exist
 /// in the current context, the macro will cause a compilation error.
 /// This macro is mainly intended for debugging purposes and to improve
@@ -24,6 +24,12 @@
 ///
 /// 3. Fields within structs are referred to with the `in` keyword,
 ///    e.g. `name_of!(some_field in SomeType)`.
+///
+/// 4. Enum variants support multiple syntaxes:
+///    - Unit variants: `name_of!(EnumName::Variant)` → `"Variant"`
+///    - Tuple variants with range: `name_of!(EnumName::Variant(..))` → `"Variant"`
+///    - Tuple variants with values: `name_of!(EnumName::Variant(value1, value2))` → `"Variant(value1, value2)"`
+///    - Struct variants: `name_of!(EnumName::Variant { .. })` → `"Variant"`
 ///
 ///
 /// # Examples
@@ -41,6 +47,13 @@
 ///
 /// struct GenericStruct<T> {
 ///     test_field_t: T,
+/// }
+///
+/// #[derive(Debug)]
+/// enum Color {
+///     Red,
+///     Rgb(u8, u8, u8),
+///     Hsl { h: u16, s: u8, l: u8 },
 /// }
 ///
 /// fn greet() -> &'static str {
@@ -77,6 +90,12 @@
 ///     name_of!(type f64)
 /// );
 ///
+/// // Enum variants
+/// println!("Unit variant: {}", name_of!(Color::Red)); // "Red"
+/// println!("Tuple variant: {}", name_of!(Color::Rgb(..))); // "Rgb"
+/// println!("Tuple variant with values: {}", name_of!(Color::Rgb(255, 128, 0))); // "Rgb(255, 128, 0)"
+/// println!("Struct variant: {}", name_of!(Color::Hsl { .. })); // "Hsl"
+///
 /// # }
 /// ```
 #[macro_export]
@@ -108,6 +127,51 @@ macro_rules! name_of {
             let _ = &<$t>::$n;
         };
         stringify!($n)
+    }};
+
+    // Covers Enum Unit Variants
+    ($enum_name:ident :: $variant:ident) => {{
+        let _ = || {
+            let _ = $enum_name::$variant;
+        };
+        stringify!($variant)
+    }};
+
+    // Covers Enum Tuple Variants with range syntax
+    ($enum_name:ident :: $variant:ident ( .. )) => {{
+        let _ = || {
+            // Use pattern matching to verify the variant exists
+            match None::<$enum_name> {
+                Some($enum_name::$variant(..)) => {}
+                _ => {}
+            }
+        };
+        stringify!($variant)
+    }};
+
+    // Covers Enum Tuple Variants with specific values
+    ($enum_name:ident :: $variant:ident ( $($value:expr),+ )) => {{
+        let _ = || {
+            let _ = $enum_name::$variant($($value,)*);
+        };
+        {
+            extern crate std;
+            let variant_name = stringify!($variant);
+            let values = std::vec![$(std::format!("{:?}", $value)),+];
+            std::format!("{}({})", variant_name, values.join(", "))
+        }
+    }};
+
+    // Covers Enum Struct Variants
+    ($enum_name:ident :: $variant:ident { .. }) => {{
+        let _ = || {
+            // Use pattern matching to verify the variant exists
+            match None::<$enum_name> {
+                Some($enum_name::$variant { .. }) => {}
+                _ => {}
+            }
+        };
+        stringify!($variant)
     }};
 }
 
@@ -141,85 +205,6 @@ macro_rules! name_of_type {
     }};
 }
 
-/// Takes an enum variant as its parameter and returns its unqualified string representation.
-/// If the enum variant does not exist in the current context, the macro will cause a compilation error.
-/// This macro is mainly intended for debugging purposes and to improve the refactoring experience.
-///
-/// The syntax supports different forms of enum variants with different output formats:
-///
-/// 1. Unit variants: `tag_of!(SomeEnum::Variant)` → `"Variant"`
-/// 2. Tuple variants with range: `tag_of!(SomeEnum::Variant(..))` → `"Variant"`
-/// 3. Tuple variants with values: `tag_of!(SomeEnum::Variant(value1, value2))` → `"Variant(value1, value2)"`
-/// 4. Struct variants: `tag_of!(SomeEnum::Variant { .. })` → `"Variant"`
-///
-/// # Examples
-///
-/// ```
-/// # #[macro_use] extern crate nameof;
-/// # fn main() {
-/// #[derive(Debug)]
-/// enum Color {
-///     Red,
-///     Green,
-///     Blue,
-///     Rgb(u8, u8, u8),
-///     Hsl { h: u16, s: u8, l: u8 },
-/// }
-///
-/// println!("Unit variant: {}", tag_of!(Color::Red)); // "Red"
-/// println!("Tuple variant: {}", tag_of!(Color::Rgb(..))); // "Rgb"
-/// println!("Tuple variant with values: {}", tag_of!(Color::Rgb(255, 128, 0))); // "Rgb(255, 128, 0)"
-/// println!("Struct variant: {}", tag_of!(Color::Hsl { .. })); // "Hsl"
-/// # }
-/// ```
-#[macro_export]
-macro_rules! tag_of {
-    // Unit variants: EnumName::Variant
-    ($enum_name:ident :: $variant:ident) => {{
-        let _ = || {
-            let _ = $enum_name::$variant;
-        };
-        stringify!($variant)
-    }};
-
-    // Tuple variants with range: EnumName::Variant(..)
-    ($enum_name:ident :: $variant:ident ( .. )) => {{
-        let _ = || {
-            // Use pattern matching to verify the variant exists
-            match None::<$enum_name> {
-                Some($enum_name::$variant(..)) => {}
-                _ => {}
-            }
-        };
-        stringify!($variant)
-    }};
-
-    // Tuple variants with specific values: EnumName::Variant(value1, value2, ...)
-    ($enum_name:ident :: $variant:ident ( $($value:expr),+ )) => {{
-        let _ = || {
-            let _ = $enum_name::$variant($($value,)*);
-        };
-        {
-            extern crate std;
-            let variant_name = stringify!($variant);
-            let values = std::vec![$(std::format!("{:?}", $value)),+];
-            std::format!("{}({})", variant_name, values.join(", "))
-        }
-    }};
-
-    // Struct variants with fields: EnumName::Variant { .. }
-    ($enum_name:ident :: $variant:ident { .. }) => {{
-        let _ = || {
-            // Use pattern matching to verify the variant exists
-            match None::<$enum_name> {
-                Some($enum_name::$variant { .. }) => {}
-                _ => {}
-            }
-        };
-        stringify!($variant)
-    }};
-}
-
 #[cfg(test)]
 extern crate std;
 
@@ -249,6 +234,7 @@ mod tests {
         test_field_u: U,
     }
 
+    #[allow(dead_code)]
     #[derive(Debug)]
     enum TestEnum {
         UnitVariant,
@@ -334,38 +320,39 @@ mod tests {
         assert_eq!(name_of!(const TEST_CONST in TestStruct), "TEST_CONST");
     }
 
+    // Tests for name_of! macro with enum variants
     #[test]
-    fn tag_of_unit_variant() {
-        assert_eq!(tag_of!(TestEnum::UnitVariant), "UnitVariant");
+    fn name_of_enum_unit_variant() {
+        assert_eq!(name_of!(TestEnum::UnitVariant), "UnitVariant");
     }
 
     #[test]
-    fn tag_of_tuple_variant() {
-        assert_eq!(tag_of!(TestEnum::TupleVariant(..)), "TupleVariant");
+    fn name_of_enum_tuple_variant() {
+        assert_eq!(name_of!(TestEnum::TupleVariant(..)), "TupleVariant");
     }
 
     #[test]
-    fn tag_of_tuple_variant_multiple() {
+    fn name_of_enum_tuple_variant_multiple() {
         assert_eq!(
-            tag_of!(TestEnum::TupleVariantMultiple(..)),
+            name_of!(TestEnum::TupleVariantMultiple(..)),
             "TupleVariantMultiple"
         );
     }
 
     #[test]
-    fn tag_of_struct_variant() {
-        assert_eq!(tag_of!(TestEnum::StructVariant { .. }), "StructVariant");
+    fn name_of_enum_struct_variant() {
+        assert_eq!(name_of!(TestEnum::StructVariant { .. }), "StructVariant");
     }
 
     #[test]
-    fn tag_of_tuple_variant_with_values() {
-        assert_eq!(tag_of!(TestEnum::TupleVariant(42)), "TupleVariant(42)");
+    fn name_of_enum_tuple_variant_with_values() {
+        assert_eq!(name_of!(TestEnum::TupleVariant(42)), "TupleVariant(42)");
     }
 
     #[test]
-    fn tag_of_tuple_variant_multiple_with_values() {
+    fn name_of_enum_tuple_variant_multiple_with_values() {
         assert_eq!(
-            tag_of!(TestEnum::TupleVariantMultiple(42, "test".to_string())),
+            name_of!(TestEnum::TupleVariantMultiple(42, "test".to_string())),
             "TupleVariantMultiple(42, \"test\")"
         );
     }
